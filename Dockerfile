@@ -4,8 +4,8 @@ ARG QEMU_VERSION=4.2.0
 ENV QEMU_TARBALL="qemu-${QEMU_VERSION}.tar.xz"
 WORKDIR /qemu
 
-RUN apt-get update && \
-    apt-get -y install \
+RUN DEBIAN_FRONTEND="noninteractive" apt-get update && \
+    DEBIAN_FRONTEND="noninteractive" apt-get -y install \
                        wget \
 		       gpg \
 		       pkg-config \
@@ -17,6 +17,8 @@ RUN apt-get update && \
 		       zlib1g-dev \
                        flex \
                        bison
+
+RUN ln -fs /usr/share/zoneinfo/America/New_York /etc/localtime && dpkg-reconfigure --frontend noninteractive tzdata
 
 RUN # Download source...
 RUN wget "https://download.qemu.org/${QEMU_TARBALL}"
@@ -46,8 +48,8 @@ COPY --from=qemu-system-arm-builder /qemu/arm-softmmu/qemu-system-arm /usr/local
 
 ADD $RPI_KERNEL_URL /tmp/qemu-rpi-kernel.zip
 
-RUN apt-get update && \
-    apt-get -y install \
+RUN DEBIAN_FRONTEND="noninteractive" apt-get update && \
+    DEBIAN_FRONTEND="noninteractive" apt-get -y install \
 			unzip \ 
 			expect
 RUN cd /tmp && \
